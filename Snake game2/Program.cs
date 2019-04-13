@@ -12,15 +12,21 @@ namespace Snake_game2
         {
             Board board = new Board(10, 10);
             Snake snake = new Snake(board);
-            GameStatus status = new GameStatus();
-
-            while(!status.IsGameOver())
+         
+            while (!snake.IsGameOver())
             {
                 char direction;
 
                 direction = Console.ReadKey().KeyChar;
 
                 snake.Direction( direction);
+                
+            }
+
+            if (snake.IsGameOver())
+            {
+                Console.WriteLine();
+                Console.WriteLine("GAME OVER !");
             }
         }
     }

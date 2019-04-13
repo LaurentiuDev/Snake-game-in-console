@@ -10,37 +10,53 @@ namespace Snake_game2
     {
         private int height;
         private int width;
-        private char[,] board;
+        private readonly char[,] board;
+        private readonly GameStatus gameStatus = new GameStatus();
+        private RandomGenerator random = new RandomGenerator();
 
         public Board(int height, int width)
         {
+            board = new char[height, width];
+            InitializeBoard(height,width);
+        }
+
+        private void InitializeBoard(int height, int width)
+        {
             this.height = height;
             this.width = width;
-            board = new char[height,width];
 
             for (int i = 0; i < height; i++)
             {
                 for (int j = 0; j < width; j++)
                 {
-                    if ((i == 0 || i == height - 1) && j > 0 && j < height - 1) {
+                    if ((i == 0 || i == height - 1) && j > 0 && j < height - 1)
+                    {
                         board[i, j] = '-';
-                    } else if ((j == 0 || j == height - 1) && i > 0 && i < height - 1)
+                    }
+                    else if ((j == 0 || j == height - 1) && i > 0 && i < height - 1)
                     {
                         board[i, j] = '|';
-                    }else if(i > 0 && j > 0 && i < height - 1 && j < height -1)
+                    }
+                    else if (i > 0 && j > 0 && i < height - 1 && j < height - 1)
                     {
                         board[i, j] = '.';
                     }
-                   
+
                 }
             }
 
+            board[1, 1] = '@';
+
+            RandomFruitsPosition();
+            RandomObstaclePosition();
+            Draw();
         }
 
         public bool IsObstacle(int xPosition, int yPosition)
         {
             String obstacle = "|-#@";
-            if(board[xPosition,yPosition].ToString().Contains(obstacle))
+
+            if(obstacle.Contains(board[xPosition,yPosition]))
             {
                 return true;
             }
@@ -52,54 +68,75 @@ namespace Snake_game2
         {
             if(board[xPosition,yPosition] == '*')
             {
+                IncrementScore();
                 return true;
             }
 
             return false;
         }
 
-        public void AddSnakeTail(int xPosition, int yPosition)
+        private void IncrementScore()
         {
-            board[xPosition, yPosition] = '@';
+            gameStatus.Score++;
         }
 
-        public void RemoveSnakeTail(int xPosition, int yPosition)
+        public void AddSnakeTail(int xPosition, int yPosition) => board[xPosition, yPosition] = '@';
+
+        public void RemoveSnakeTail(int xPosition, int yPosition) => board[xPosition, yPosition] = '.';
+
+        private void AddItemToBoard(int xPosition, int yPosition, char item)
         {
-            board[xPosition, yPosition] = '.';
+            board[xPosition, yPosition] = item;
         }
 
-        public void AddFruit(int xPosition, int yPosition)
+        private void AddItem(String item)
         {
-            if(IsInvalidPosition(xPosition, yPosition))
+            if(!item.Equals("Fruit") && !item.Equals("Obstacle"))
             {
-                return;
+                throw new ArgumentException("Your argument is invalid");
             }
 
-            board[xPosition,yPosition] = '*';
-        }
+            int xPosition, yPosition, numbersOfItems;
 
-        public void AddObstacle(int xPosition, int yPosition)
-        {
-            if (IsInvalidPosition(xPosition, yPosition))
+            numbersOfItems = random.RandomNumbersOfItems(this.height, this.width);
+
+            while (numbersOfItems > 0)
             {
-                return;
-            }
+                xPosition = random.RandomCoordonateX(this.height);
+                yPosition = random.RandomCoordonateY(this.width);
 
-            board[xPosition, yPosition] = '#';
+                if (item.Equals("Fruit"))
+                {
+                    AddFruit(xPosition, yPosition);
+                }
+
+                if (item.Equals("Obstacle"))
+                {
+                    AddObstacle(xPosition, yPosition);
+                }
+
+                numbersOfItems--;
+            }
         }
 
-        private bool IsInvalidPosition(int xPosition, int yPosition)
+        private void RandomFruitsPosition()
         {
-            if (xPosition <= 0 || xPosition >= this.height || yPosition <= 0 || yPosition >= this.width || board[xPosition, yPosition] == '*')
-            {
-                return true;
-            }
-
-            return false;
+            AddItem("Fruit");
         }
+
+        private void RandomObstaclePosition()
+        {
+            AddItem("Obstacle");
+        }
+
+        private void AddFruit(int xPosition, int yPosition) => AddItemToBoard(xPosition, yPosition, '*');
+
+        private void AddObstacle(int xPosition, int yPosition) => AddItemToBoard(xPosition, yPosition, '#');
 
         public void Draw()
         {
+            Console.Clear();
+
             for (int i = 0; i < height; i++)
             {
                 for (int j = 0; j < width; j++)
@@ -108,34 +145,8 @@ namespace Snake_game2
                 }
                 Console.Write('\n');
             }
+
+            Console.WriteLine($"Your score is : {gameStatus.Score}");
         }
-
-        public int Height
-        {
-            get
-            {
-                return this.height;
-            }
-            set
-            {
-                this.height = value;
-            }
-        }
-
-        public int Width
-        {
-            get
-            {
-                return this.width;
-            }
-            set
-            {
-                this.width = value;
-            }
-        }
-
-       
-
-        
     }
 }

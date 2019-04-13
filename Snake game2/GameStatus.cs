@@ -9,27 +9,23 @@ namespace Snake_game2
     class GameStatus
     {
         private bool gameOver;
+        private int score;
         public GameStatus()
         {
             gameOver = false;
         }
 
-        public void GameOver(bool die)
+        public bool GameOver
         {
-            if (die)
-            {
-                this.gameOver = true;
-            }
-
-            this.gameOver = false;
+            get { return this.gameOver; }
+            set { this.gameOver = value; }
         }
 
-        public bool IsGameOver()
+        public int Score
         {
-            if(this.gameOver == true)
-                return true;
-
-            return false;
+            get { return this.score; }
+            set { this.score = value; }
         }
+
     }
 }

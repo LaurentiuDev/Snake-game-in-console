@@ -8,25 +8,26 @@ namespace Snake_game2
 {
     class Snake
     {
-        private int x;
-        private int y;
-        private Board board;
-        private GameStatus gameStatus;
-        private List<Tuple<int, int>> tail = new List<Tuple<int, int>>();
+        private int X;
+        private int Y;
+        private readonly Board board;
+        private readonly GameStatus gameStatus;
+        private readonly List<Tuple<int, int>> tail = new List<Tuple<int, int>>();
+
 
         public Snake(Board board)
         {
             this.board = board;
-            this.x = 1;
-            this.y = 1;
-            tail.Add(new Tuple<int, int>(this.x, this.y));
-            board.AddSnakeTail(this.x, this.y);
-            //gameStatus = new GameStatus();
+            this.X = 1;
+            this.Y = 1;
+            tail.Add(new Tuple<int, int>(this.X, this.Y));
+            board.AddSnakeTail(this.X, this.Y);
+            gameStatus = new GameStatus();
         }
 
-        public bool GetGameStatus()
+        public bool IsGameOver()
         {
-            if(gameStatus.IsGameOver())
+            if(gameStatus.GameOver)
                 return true;
 
             return false;
@@ -48,26 +49,20 @@ namespace Snake_game2
             int[] dx = { -1, 0, 1, 0 };
             int[] dy = { 0, 1, 0, -1 };
 
-            int nextX, nextY, height, width;
+            int nextX, nextY;
 
-            height = board.Height;
-            width = board.Width;
-
-            nextX = this.x + dx[direction];
-            nextY = this.y + dy[direction];
-
-            if(nextX < 0 || nextY < 0)
-            {
-                return;
-            }
+            nextX = this.X + dx[direction];
+            nextY = this.Y + dy[direction];
 
             if (board.IsObstacle(nextX, nextY))
             {
-                gameStatus.GameOver(true);
+                gameStatus.GameOver = true;
+            }
+            else
+            {
+                Move(nextX, nextY);
             }
 
-            Move(nextX, nextY);
-           
         }
 
         
@@ -99,26 +94,23 @@ namespace Snake_game2
 
         public void Move(int nextX,int nextY)
         {
-            this.x = nextX;
-            this.y = nextY;
-
-            board.AddSnakeTail(nextX, nextY);
+            this.X = nextX;
+            this.Y = nextY;
 
             tail.Add(new Tuple<int, int>(nextX, nextY));
 
-            if(!board.IsPoint(tail.First().Item1, tail.First().Item2))
+            if(!board.IsPoint(nextX, nextY))
             {
                 board.RemoveSnakeTail(tail.First().Item1, tail.First().Item2);
 
                 tail.Remove(tail.First());
-            }
+            } 
+
+            board.AddSnakeTail(nextX, nextY);
 
             board.Draw();
             
         }
 
-        public int GetX { get => x; set => x = value; }
-
-        public int GetY { get => y; set => y = value; }
     }
 }
